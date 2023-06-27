@@ -10,7 +10,7 @@ class Channel:
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.channel_id = channel_id
+        self.__channel_id = channel_id
         self.youtube = self.get_service()
         self.channel = self.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
         self.title = self.channel["items"][0]["snippet"]["title"]
@@ -20,6 +20,10 @@ class Channel:
         self.video_count = self.channel["items"][0]["statistics"]["videoCount"]
         self.view_count = self.channel["items"][0]["statistics"]["viewCount"]
 
+    @property
+    def channel_id(self):
+        return self.__channel_id
+
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
 
@@ -27,9 +31,11 @@ class Channel:
 
     @classmethod
     def get_service(cls):
+        """Класс-метод, возвращающий объект для работы с YouTube API"""
         return googleapiclient.discovery.build('youtube', 'v3', developerKey=cls.api_key)
 
     def to_json(self, file_name):
+        """Метод, сохраняющий в файл значения атрибутов экземпляра `Channel`"""
         channel_dict = {
             "channel_id": self.channel_id,
             "desription": self.description,
